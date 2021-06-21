@@ -9,7 +9,31 @@ const Sidebar = () => {
   return (
     <aside>
       <div className='description'>
-        You can drag these nodes to the pane on the right.
+        <strong>How it works?</strong>
+        <br />
+        <br />
+        Drag and drop the needed node for using it. The start node is the
+        beginning of the dialog, switch node for having a message from the
+        chatbot that the user can reply to with different messages, and the
+        message node is the final output of the chatbot.
+        <br />
+        <br />
+        <strong>Controls</strong>
+        <ul>
+          <li>
+            <em>Click</em> on an element to select it
+          </li>
+          <li>
+            <em>Backspace:</em> deletes selected element (node or edge)
+          </li>
+          <li>
+            <em>Left Arrow:</em> deletes written text of selected element
+          </li>
+          <li>
+            <em>Enter:</em> Unselects an element
+          </li>
+        </ul>
+
       </div>
       <div
         className='dndnode input'

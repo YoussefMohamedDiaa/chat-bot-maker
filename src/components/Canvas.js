@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -10,6 +10,7 @@ import ReactFlow, {
 import Sidebar from './Sidebar'
 
 import './flow.css'
+import useEventListener from '../hooks/EventListener'
 
 const initialElements = []
 
@@ -53,7 +54,7 @@ const DnDFlow = () => {
   const reactFlowWrapper = useRef(null)
   const [reactFlowInstance, setReactFlowInstance] = useState(null)
   const [elements, setElements] = useState(initialElements)
-  const [elementInFocusId, setElementInFocusId] = useState(null)
+  const [elementInFocus, setElementInFocus] = useState(null)
 
   const onConnect = (params) =>
     setElements((els) =>
@@ -69,8 +70,8 @@ const DnDFlow = () => {
     )
 
   const onElementClick = (event, element) => {
-    setElementInFocusId(element.id)
-    console.log('click', element.id)
+    setElementInFocus(element)
+    clearDefaultElementText(element)
   }
 
   const onElementsRemove = (elementsToRemove) =>
@@ -98,29 +99,65 @@ const DnDFlow = () => {
     setElements((es) => es.concat(newNode))
   }
 
-  const updateInFocusElement = (key) => {
+  const clearDefaultElementText = (element) => {
     const updatedElements = elements.map((e) => {
-      if (e.id === elementInFocusId) return { ...e, label: e.label + key }
+      if (
+        e.id === element.id &&
+        e.source &&
+        e.label === 'Click and write text here'
+      )
+        return { ...e, label: '' }
+      if (e.id === element.id && e.data && e.data.label === 'Click and write text here')
+        return { ...e, data: { ...e.data, label: '' } }
       return e
     })
-    console.log(updateInFocusElement)
+    setElements(updatedElements)
+  }
+
+  const updateInFocusElement = (key) => {
+    const updatedElements = elements.map((e) => {
+      if (e.id === elementInFocus.id && e.source)
+        return { ...e, label: e.label + key }
+      if (e.id === elementInFocus.id && e.data)
+        return { ...e, data: { ...e.data, label: e.data.label + key } }
+      return e
+    })
+    setElements(updatedElements)
+  }
+
+  const backspaceInFocusElement = () => {
+    const deleteLastChar = (s) =>
+      s.length > 0 ? s.substring(s, s.length - 1) : ''
+    const updatedElements = elements.map((e) => {
+      if (e.id === elementInFocus.id && e.source)
+        return { ...e, label: deleteLastChar(e.label) }
+      if (e.id === elementInFocus.id && e.data)
+        return {
+          ...e,
+          data: {
+            ...e.data,
+            label: deleteLastChar(e.data.label)
+          }
+        }
+      return e
+    })
     setElements(updatedElements)
   }
 
   const onKeyDown = ({ key }) => {
-    console.log(1)
-    if (key === 'Enter' || elementInFocusId === null) {
-      console.log(key, elementInFocusId)
-      setElementInFocusId(null)
+    if (key === 'Enter' || key === 'Escape' || elementInFocus === null) {
+      setElementInFocus(null)
       return
     }
-    console.log(2)
+    if (elementInFocus.data && elementInFocus.data.label === 'Start') return
+    if (key === 'ArrowLeft') {
+      backspaceInFocusElement()
+      return
+    }
     if (key.length === 1) updateInFocusElement(key)
-    console.log(3)
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => document.addEventListener('keydown', onKeyDown), [])
+  useEventListener('keydown', onKeyDown, document)
 
   return (
     <div className='canvas'>
