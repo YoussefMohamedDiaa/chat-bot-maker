@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
   removeElements,
-  Controls
+  Controls,
+  Background
 } from 'react-flow-renderer'
 
 import Sidebar from './Sidebar'
@@ -52,6 +53,8 @@ const DnDFlow = () => {
   const reactFlowWrapper = useRef(null)
   const [reactFlowInstance, setReactFlowInstance] = useState(null)
   const [elements, setElements] = useState(initialElements)
+  const [elementInFocusId, setElementInFocusId] = useState(null)
+
   const onConnect = (params) =>
     setElements((els) =>
       addEdge(
@@ -64,6 +67,12 @@ const DnDFlow = () => {
         els
       )
     )
+
+  const onElementClick = (event, element) => {
+    setElementInFocusId(element.id)
+    console.log('click', element.id)
+  }
+
   const onElementsRemove = (elementsToRemove) =>
     setElements((els) => removeElements(elementsToRemove, els))
 
@@ -89,6 +98,30 @@ const DnDFlow = () => {
     setElements((es) => es.concat(newNode))
   }
 
+  const updateInFocusElement = (key) => {
+    const updatedElements = elements.map((e) => {
+      if (e.id === elementInFocusId) return { ...e, label: e.label + key }
+      return e
+    })
+    console.log(updateInFocusElement)
+    setElements(updatedElements)
+  }
+
+  const onKeyDown = ({ key }) => {
+    console.log(1)
+    if (key === 'Enter' || elementInFocusId === null) {
+      console.log(key, elementInFocusId)
+      setElementInFocusId(null)
+      return
+    }
+    console.log(2)
+    if (key.length === 1) updateInFocusElement(key)
+    console.log(3)
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => document.addEventListener('keydown', onKeyDown), [])
+
   return (
     <div className='canvas'>
       <Sidebar />
@@ -98,6 +131,7 @@ const DnDFlow = () => {
             <ReactFlow
               elements={elements}
               onConnect={onConnect}
+              onElementClick={onElementClick}
               onElementsRemove={onElementsRemove}
               onLoad={onLoad}
               onDrop={onDrop}
@@ -105,6 +139,7 @@ const DnDFlow = () => {
               snapToGrid={true}
               snapGrid={[15, 15]}
             >
+              <Background />
               <Controls />
             </ReactFlow>
           </div>
