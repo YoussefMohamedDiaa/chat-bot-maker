@@ -5,10 +5,10 @@ import Chat from './components/Chat'
 
 function App() {
   return (
-    <div className="full-screen">
-      {/* <Chat /> */}
+    <React.Fragment>
+      <Chat />
       <Canvas />
-    </div>
+    </React.Fragment>
   )
 }
 

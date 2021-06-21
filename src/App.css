@@ -1,13 +1,58 @@
-.full-screen {
+.canvas {
   width: 100vw;
   height: 100vh;
 }
 
+.canvas aside {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  border-right: 1px solid #eee;
+  height: 20%;
+  padding: 15px 10px;
+  font-size: 12px;
+  background: #fcfcfc;
+}
+
+.canvas aside .description {
+  margin-bottom: 10px;
+}
+
+.dndnode {
+  height: 20px;
+  padding: 4px;
+  border: 1px solid #1a192b;
+  border-radius: 2px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+}
+
+.dndnode.input {
+  background-color: #4ECB71;
+}
+
+.dndnode.output {
+  background-color: #D99Bff;
+}
+
+@media screen and (min-width: 768px) {
+  .canvas aside {
+    width: 20%;
+    max-width: 250px;
+  }
+}
+
 .chat {
   position: absolute;
+  z-index: 5;
   right: 0;
   height: calc(90vh - 64px);
   width: 20%;
+  min-width: 300px;
 
   margin: 32px;
   padding: 24px;
