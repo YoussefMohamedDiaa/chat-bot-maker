@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useContext } from 'react'
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -11,8 +11,7 @@ import Sidebar from './Sidebar'
 
 import './flow.css'
 import useEventListener from '../hooks/EventListener'
-
-const initialElements = []
+import EditorContext from '../context/EditorContext'
 
 let id = 0
 const getId = () => `dndnode_${id++}`
@@ -50,32 +49,40 @@ const createNode = (type, position) => {
   }
 }
 
-const DnDFlow = () => {
+const Canvas = () => {
   const reactFlowWrapper = useRef(null)
   const [reactFlowInstance, setReactFlowInstance] = useState(null)
-  const [elements, setElements] = useState(initialElements)
   const [elementInFocus, setElementInFocus] = useState(null)
 
+  const [editorContext, setEditorContext] = useContext(EditorContext)
+  // const [elements, setElements] = useState(initialElements)
+
   const onConnect = (params) =>
-    setElements((els) =>
-      addEdge(
+    setEditorContext((prevEditorContext) => ({
+      ...prevEditorContext,
+      elements: addEdge(
         {
           ...params,
           type: 'smoothstep',
-          label: 'Click and write text here',
+          label:
+            params.source === editorContext.startNodeId
+              ? ''
+              : 'Click and write text here',
           arrowHeadType: 'arrowclosed'
         },
-        els
+        prevEditorContext.elements
       )
-    )
+    }))
 
   const onElementClick = (event, element) => {
     setElementInFocus(element)
-    clearDefaultElementText(element)
   }
 
   const onElementsRemove = (elementsToRemove) =>
-    setElements((els) => removeElements(elementsToRemove, els))
+    setEditorContext((prevEditorContext) => ({
+      ...prevEditorContext,
+      elements: removeElements(elementsToRemove, prevEditorContext.elements)
+    }))
 
   const onLoad = (_reactFlowInstance) =>
     setReactFlowInstance(_reactFlowInstance)
@@ -96,39 +103,47 @@ const DnDFlow = () => {
     })
     const newNode = createNode(type, position)
 
-    setElements((es) => es.concat(newNode))
-  }
+    setEditorContext((prevEditorContext) => ({
+      ...prevEditorContext,
+      startNodeId:
+        type === 'input' ? newNode.id : prevEditorContext.startNodeId,
+      elements: prevEditorContext.elements.concat(newNode)
+    }))
 
-  const clearDefaultElementText = (element) => {
-    const updatedElements = elements.map((e) => {
-      if (
-        e.id === element.id &&
-        e.source &&
-        e.label === 'Click and write text here'
-      )
-        return { ...e, label: '' }
-      if (e.id === element.id && e.data && e.data.label === 'Click and write text here')
-        return { ...e, data: { ...e.data, label: '' } }
-      return e
-    })
-    setElements(updatedElements)
+    console.log(editorContext)
   }
 
   const updateInFocusElement = (key) => {
-    const updatedElements = elements.map((e) => {
-      if (e.id === elementInFocus.id && e.source)
-        return { ...e, label: e.label + key }
+    const updatedElements = editorContext.elements.map((e) => {
+      if (
+        e.id === elementInFocus.id &&
+        e.source &&
+        e.source !== editorContext.startNodeId
+      )
+        return {
+          ...e,
+          label: e.label === 'Click and write text here' ? key : e.label + key
+        }
       if (e.id === elementInFocus.id && e.data)
-        return { ...e, data: { ...e.data, label: e.data.label + key } }
+        return {
+          ...e,
+          data: {
+            ...e.data,
+            label:
+              e.data.label === 'Click and write text here'
+                ? key
+                : e.data.label + key
+          }
+        }
       return e
     })
-    setElements(updatedElements)
+    setEditorContext({ ...editorContext, elements: updatedElements })
   }
 
   const backspaceInFocusElement = () => {
     const deleteLastChar = (s) =>
       s.length > 0 ? s.substring(s, s.length - 1) : ''
-    const updatedElements = elements.map((e) => {
+    const updatedElements = editorContext.elements.map((e) => {
       if (e.id === elementInFocus.id && e.source)
         return { ...e, label: deleteLastChar(e.label) }
       if (e.id === elementInFocus.id && e.data)
@@ -141,7 +156,7 @@ const DnDFlow = () => {
         }
       return e
     })
-    setElements(updatedElements)
+    setEditorContext({ ...editorContext, elements: updatedElements })
   }
 
   const onKeyDown = ({ key }) => {
@@ -154,7 +169,9 @@ const DnDFlow = () => {
       backspaceInFocusElement()
       return
     }
-    if (key.length === 1) updateInFocusElement(key)
+    if (key.length === 1) {
+      updateInFocusElement(key)
+    }
   }
 
   useEventListener('keydown', onKeyDown, document)
@@ -166,7 +183,7 @@ const DnDFlow = () => {
         <ReactFlowProvider>
           <div className='reactflow-wrapper' ref={reactFlowWrapper}>
             <ReactFlow
-              elements={elements}
+              elements={editorContext.elements}
               onConnect={onConnect}
               onElementClick={onElementClick}
               onElementsRemove={onElementsRemove}
@@ -186,4 +203,4 @@ const DnDFlow = () => {
   )
 }
 
-export default DnDFlow
+export default Canvas
