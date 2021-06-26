@@ -55,7 +55,6 @@ const Canvas = () => {
   const [elementInFocus, setElementInFocus] = useState(null)
 
   const [editorContext, setEditorContext] = useContext(EditorContext)
-  // const [elements, setElements] = useState(initialElements)
 
   const onConnect = (params) =>
     setEditorContext((prevEditorContext) => ({
