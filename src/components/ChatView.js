@@ -1,4 +1,8 @@
 import React from 'react'
+import Chatbot from 'react-chatbot-kit'
+import ActionProvider from './ActionProvider';
+import MessageParser from './MessageParser';
+import config from './config'
 
 const exampleChatList = [
   {
@@ -34,7 +38,7 @@ const otherExampleChatList = [
 // onResponseClick(response: String) gets called when a user clicks a reply.
 
 const ChatView = ({ chatList, onResponseClick, onChatStart }) => {
-  return <h1>Hello</h1>
+  return <Chatbot config={config} actionProvider={ActionProvider} messageParser={MessageParser}/>
 }
 
 export default ChatView
