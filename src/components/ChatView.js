@@ -1,40 +1,39 @@
+import { Button, List, Paper } from '@material-ui/core'
 import React from 'react'
-
-const exampleChatList = [
-  {
-    text: 'How are you feeling today?',
-    replies: ['Good', 'So So', 'Bad'],
-    selectedReply: 'Good'
-  },
-  {
-    text: 'Ok Very nice',
-    replies: ['Thank You', 'Thanks'],
-    selectedReply: null
-  }
-]
-
-const otherExampleChatList = [
-  {
-    text: 'How are you feeling today?',
-    replies: ['Good', 'So So', 'Bad'],
-    selectedReply: 'Good'
-  },
-  {
-    text: 'Ok Very nice',
-    replies: ['Thank You', 'Thanks'],
-    selectedReply: 'Thanks'
-  },
-  {
-    text: 'Ok Very nice',
-    replies: null,
-    selectedReply: null
-  }
-]
-
-// onResponseClick(response: String) gets called when a user clicks a reply.
+import Message from './Message'
 
 const ChatView = ({ chatList, onResponseClick, onChatStart }) => {
-  return <h1>Hello</h1>
+  return (
+    <div className='chat-view'>
+      <List
+        style={{ maxHeight: 'calc(0.8 * (90vh - 64px));', overflow: 'auto' }}
+      >
+        {chatList.map((message, index) => (
+          <Message
+            key={index}
+            text={message.text}
+            replies={message.replies}
+            selectedReply={message.selectedReply}
+            onResponseClick={onResponseClick}
+          />
+        ))}
+      </List>
+      <Button
+        style={{
+          background: '#4ECB71',
+          borderRadius: 50,
+          color: '#ffffff',
+          padding: 16,
+          paddingTop: 12,
+          paddingBottom: 12,
+          fontWeight: 'bold'
+        }}
+        onClick={onChatStart}
+      >
+        {'Press to start new chat'}
+      </Button>
+    </div>
+  )
 }
 
 export default ChatView

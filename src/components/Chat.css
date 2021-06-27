@@ -1,0 +1,28 @@
+.chat-view {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  font-weight: bold;
+  color: white;
+}
+
+.message {
+  margin-bottom: 24px;
+}
+
+.message-text {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
+  width: fit-content;
+  max-width: min(360px, 100%);
+  border-radius: 12px;
+  background: #6bb7fd;
+  overflow-wrap: break-word;
+}
+
+.replies {
+  display: flex;
+  flex-wrap: wrap;
+}

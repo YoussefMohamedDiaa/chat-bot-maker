@@ -9,7 +9,7 @@ import ReactFlow, {
 
 import Sidebar from './Sidebar'
 
-import './flow.css'
+import './Flow.css'
 import useEventListener from '../hooks/EventListener'
 import EditorContext from '../context/EditorContext'
 
@@ -108,8 +108,6 @@ const Canvas = () => {
         type === 'input' ? newNode.id : prevEditorContext.startNodeId,
       elements: prevEditorContext.elements.concat(newNode)
     }))
-
-    console.log(editorContext)
   }
 
   const updateInFocusElement = (key) => {

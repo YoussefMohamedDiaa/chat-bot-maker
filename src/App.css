@@ -53,6 +53,7 @@
   height: calc(90vh - 64px);
   width: 15%;
   min-width: 300px;
+  max-width: 500px;
 
   margin: 32px;
   padding: 24px;

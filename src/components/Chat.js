@@ -2,6 +2,9 @@ import { useContext, useState } from 'react'
 import EditorContext from '../context/EditorContext'
 import ChatView from './ChatView'
 
+import './Chat.css'
+import '../App.css'
+
 function Chat() {
   const [editorContext, _] = useContext(EditorContext)
   const [chatList, setChatList] = useState([])
@@ -14,13 +17,23 @@ function Chat() {
   }
 
   const getNextNode = (currentNodeId, response) => {
-    const nextNodeIds = editorContext.elements.filter(
+    const edges = editorContext.elements.filter(
       (e) => e.source && e.source === currentNodeId && e.label === response
     )
-    return { id: nextNodeIds[0].id, text: nextNodeIds[0].label }
+    const nextNodeId = edges[0].target
+    const nextNode = editorContext.elements.find((e) => e.id === nextNodeId)
+    return { id: nextNodeId, text: nextNode.data.label }
   }
 
   const onChatStart = () => {
+    if (
+      !editorContext.startNodeId ||
+      editorContext.elements.findIndex(
+        (e) => e.id === editorContext.startNodeId
+      ) === -1
+    )
+      return
+
     const nextNode = getNextNode(editorContext.startNodeId, '')
     const nextNodeReplies = getPossibleReplies(nextNode.id)
     const newMessage = {
@@ -44,7 +57,6 @@ function Chat() {
       replies: nextNodeReplies,
       selectedReply: null
     }
-
     setCurrentNodeId(nextNode.id)
     setChatList([...chatList.slice(0, -1), updatedLastMessage, newMessage])
   }
