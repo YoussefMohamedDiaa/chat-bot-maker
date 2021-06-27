@@ -1,4 +1,4 @@
-import { Button, List, Paper } from '@material-ui/core'
+import { Button, List } from '@material-ui/core'
 import React from 'react'
 import Message from './Message'
 
@@ -6,7 +6,10 @@ const ChatView = ({ chatList, onResponseClick, onChatStart }) => {
   return (
     <div className='chat-view'>
       <List
-        style={{ maxHeight: 'calc(0.8 * (90vh - 64px));', overflow: 'auto' }}
+        style={{
+          maxHeight: 'calc(0.8 * (90vh - 64px));',
+          overflow: 'auto'
+        }}
       >
         {chatList.map((message, index) => (
           <Message

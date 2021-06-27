@@ -56,7 +56,9 @@ const Canvas = () => {
 
   const [editorContext, setEditorContext] = useContext(EditorContext)
 
-  const onConnect = (params) =>
+  const onConnect = (params) => {
+    if (params.source === editorContext.startNodeId && startNodeHasEdge())
+      return
     setEditorContext((prevEditorContext) => ({
       ...prevEditorContext,
       elements: addEdge(
@@ -72,6 +74,7 @@ const Canvas = () => {
         prevEditorContext.elements
       )
     }))
+  }
 
   const onElementClick = (event, element) => {
     setElementInFocus(element)
@@ -91,6 +94,20 @@ const Canvas = () => {
     event.dataTransfer.dropEffect = 'move'
   }
 
+  const startNodeExists = () => {
+    if (editorContext.startNodeId === null) return false
+    return editorContext.elements.find(
+      (e) => e.id === editorContext.startNodeId
+    )
+  }
+
+  const startNodeHasEdge = () => {
+    if (!startNodeExists()) return false
+    return editorContext.elements.find(
+      (e) => e.source === editorContext.startNodeId
+    )
+  }
+
   const onDrop = (event) => {
     event.preventDefault()
 
@@ -100,6 +117,9 @@ const Canvas = () => {
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top
     })
+
+    if (type === 'input' && startNodeExists()) return
+
     const newNode = createNode(type, position)
 
     setEditorContext((prevEditorContext) => ({
