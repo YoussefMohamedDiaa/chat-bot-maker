@@ -6,6 +6,12 @@
   color: white;
 }
 
+.MuiList-padding {
+  max-height: 570px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
 .message {
   margin-bottom: 24px;
 }
